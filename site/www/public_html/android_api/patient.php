@@ -31,7 +31,11 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
         //$password = $_POST['password'];
         // check for user
         $user = $db->getPatientByEmail($email);
+                        
         if ($user != false) {
+            
+            $address = $db->getAddressByPersonId($user["person_id"]);
+            
             // user found
             // echo json with success = 1
             $response["success"] = 1;
@@ -42,6 +46,9 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
             //$response["user"]["updated_at"] = $user["updated_at"];
             $response["user"]["person_id"] = $user["person_id"];
             $response["user"]["patient_id"] = $user["patient_id"];
+            $response["user"]["telephone"] = $user["telephone"];
+            $response["address"] = $address;
+            
             echo json_encode($response);
         } else {
             // user not found
@@ -74,6 +81,7 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
                 $response["patient"]["person_id"] = $user["person_id"];
                 $response["patient"]["name"] = $user["name"];
                 $response["patient"]["email"] = $user["email"];
+                $response["user"]["telephone"] = $user["telephone"];
                 echo json_encode($response);
             } else {
                 // user failed to store

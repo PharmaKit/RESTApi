@@ -28,14 +28,14 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
         $resourceType = $_POST['resourcetype'];
         $personId = $_POST['personid'];
         $recepientName = $_POST['recepientname'];
-        $recepientAddress = $_POST['recepientAddress'];
+        $recepientAddress = $_POST['recepientaddress'];
         $offerType = $_POST['offertype'];
         
         // TODO put doctor login here.
         //$password = $_POST['password'];
         // check for user
         $result = $db->saveImageUploadDetails($resourceType, $personId, $recepientName, $recepientAddress, $offerType);
-        if ($result != false) {
+        if ($result) {
             // user found
             // echo json with success = 1
             $response["success"] = 1;

@@ -102,6 +102,20 @@ class DB_Functions_Patient {
             return false;
         }
     }
+    
+    public function getAddressByPersonId($personId) {
+        $result = mysqli_query($this->mysqli, "select * from address where person_id = $personId;");
+                
+        $no_of_rows = mysqli_num_rows($result);
+        
+        if($no_of_rows > 0) {
+            $returnValue = mysqli_fetch_array($result);
+            return $returnValue;
+        }
+        else {
+            return false;
+        }
+    }
 
     /**
      * Check user is existed or not
