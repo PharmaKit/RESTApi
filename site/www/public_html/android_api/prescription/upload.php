@@ -150,11 +150,11 @@ $recepientAddress = "recepient_address";
 $recepientNumber = "recepient_number";
 $offerType = "offer_type";
 
-$mail->Body = "PharmaKit"
-        . "\nPlease deliver the following medicines"
-        . "\nPatient Name: $imageDetails[$recepientName]"
-        . "\nPatient Address: $imageDetails[$recepientAddress]"
-        . "\nPatient Number: $imageDetails[$recepientNumber]"
+$mail->Body =s"\nPharmaKit"
+        . "\n\nPlease deliver the following medicines"
+        . "\n\nName: $imageDetails[$recepientName]"
+        . "\nAddress: $imageDetails[$recepientAddress]"
+        . "\nPhone Number: $imageDetails[$recepientNumber]"
         . "\nOffer Type: $imageDetails[$offerType]";
 
 //Attach an image file

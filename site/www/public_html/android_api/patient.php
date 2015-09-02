@@ -27,10 +27,14 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
         // Request type is check Login
         $email = $_POST['email'];
         $password = $_POST['password'];
-        // TODO put doctor login here.
-        //$password = $_POST['password'];
         // check for user
-        $user = $db->getPatientByEmail($email);
+        
+        $validCredentials = $db->getUserByEmailAndPassword($email, $password);
+        $user = false;
+        
+        if($validCredentials) {
+            $user = $db->getPatientByEmail($email);
+        }        
                         
         if ($user != false) {
             
@@ -54,7 +58,7 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
             // user not found
             // echo json with error = 1
             $response["error"] = 1;
-            $response["error_msg"] = "Incorrect email!";
+            $response["error_msg"] = "Incorrect email or password!";
             echo json_encode($response);
         }
     } else if ($tag == 'register') {
