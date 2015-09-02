@@ -147,12 +147,14 @@ $mail->Subject = 'PHPMailer GMail SMTP test';
 //$mail->AltBody = 'This is a plain-text message body';
 $recepientName = "recepient_name";
 $recepientAddress = "recepient_address";
+$recepientNumber = "recepient_number";
 $offerType = "offer_type";
 
 $mail->Body = "PharmaKit"
         . "\nPlease deliver the following medicines"
         . "\nPatient Name: $imageDetails[$recepientName]"
         . "\nPatient Address: $imageDetails[$recepientAddress]"
+        . "\nPatient Number: $imageDetails[$recepientNumber]"
         . "\nOffer Type: $imageDetails[$offerType]";
 
 //Attach an image file

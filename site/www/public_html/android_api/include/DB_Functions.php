@@ -30,10 +30,10 @@ class DB_Functions {
         
     }
     
-    public function saveImageUploadDetails($resource_type, $personId, $recepientName, $recepientAddress, $offerType){
+    public function saveImageUploadDetails($resource_type, $personId, $recepientName, $recepientAddress, $recepientNumber, $offerType){
         
-        $result = mysqli_query($this->mysqli, "insert into image_uploads (resource_type,person_id, recepient_name, recepient_address, offer_type, created_date) "
-                . "values('$resource_type', $personId, '$recepientName', '$recepientAddress', '$offerType', now() );");
+        $result = mysqli_query($this->mysqli, "insert into image_uploads (resource_type,person_id, recepient_name, recepient_address, recepient_number, offer_type, created_date) "
+                . "values('$resource_type', $personId, '$recepientName', '$recepientAddress', '$recepientNumber', '$offerType', now() );");
                
         if($result) {
             $resourceId = mysqli_insert_id($this->mysqli);
