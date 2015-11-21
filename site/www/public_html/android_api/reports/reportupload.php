@@ -67,9 +67,9 @@ $mail->setFrom('anup.pharmakit@gmail.com', 'Anup Pharma');
 //Set who the message is to be sent to
 $mail->addAddress('bestmust@gmail.com', 'John Doe');
 $mail->addAddress('suryansh.vnit@gmail.com ', 'Suryansh');
-//$mail->addAddress('anuprathi321@gmail.com', 'Anup');
+$mail->addAddress('anuprathi321@gmail.com', 'Anup');
 //$mail->addAddress('adv.niharika@gmail.com', 'Niharika');
-//$mail->addAddress('rathi.archana1011@gmail.com', 'Archana');
+$mail->addAddress('rathi.archana1011@gmail.com', 'Archana');
 
 //Set the subject line
 $mail->Subject = 'New Crash report has been uploaded';
