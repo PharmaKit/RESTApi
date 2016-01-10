@@ -70,6 +70,7 @@ $mail->addAddress('suryansh.vnit@gmail.com ', 'Suryansh');
 $mail->addAddress('anuprathi321@gmail.com', 'Anup');
 //$mail->addAddress('adv.niharika@gmail.com', 'Niharika');
 $mail->addAddress('rathi.archana1011@gmail.com', 'Archana');
+$mail->addAddress('varun7691@gmail.com', 'Varun');
 
 //Set the subject line
 $mail->Subject = 'New Crash report has been uploaded';
