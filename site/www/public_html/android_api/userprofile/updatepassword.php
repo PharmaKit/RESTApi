@@ -5,8 +5,6 @@
  * 
  * Each request will be identified by TAG
  * Response will be JSON data
- 
-  /**
  * check for POST request 
  */
 if (isset($_POST['tag']) && $_POST['tag'] != '') {
@@ -28,14 +26,21 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
         // check for user
         $resetCode = $db->generatePasswordResetCode($email);
         if ($resetCode != false) {
+            
+            $success = $db->emailPasswordResetCode($email,$resetCode);
+            
+             if ($success != false) {
             // user found
             // echo json with success = 1
             $response["success"] = 1;
-            $response["email"] = $email;
-            
-            //This is the place where we will send the email to the user registered email address.
+            $response["email"] = $email;        
             
             echo json_encode($response);
+            } else { 
+                $response["error"] = 1;
+                $response["error_msg"] = "Error occurred while sending password reset code by email. Please try again!";
+                echo json_encode($response);
+            }            
         } else {
             // user not found
             // echo json with error = 1

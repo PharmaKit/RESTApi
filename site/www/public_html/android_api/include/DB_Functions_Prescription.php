@@ -26,6 +26,19 @@ class DB_Functions_Prescription {
         }
         return $rows;
     }
+    
+    public function getPrescriptionsByPersonId($personId){
+        $result = mysqli_query($this->mysqli, "select resource_id from image_uploads where person_id = $personId order by created_date desc;");
+        $rows = array();
+        while ($r = mysqli_fetch_assoc($result)) {
+            $rows[] = $r;
+        }
+        if(sizeof($rows) > 0){
+            return $rows;
+        } else {
+            return FALSE;
+        }
+    }
 
     public function checkUnsavedPrescription($patientId, $doctorId) {
 

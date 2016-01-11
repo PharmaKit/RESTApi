@@ -159,6 +159,66 @@ class DB_Functions_UpdatePassword {
         $hash = array("salt" => $salt, "encrypted" => $encrypted);
         return $hash;
     }
-}
+    
+    public function emailPasswordResetCode($email,$resetCode) {
+        date_default_timezone_set('Etc/UTC');
+        require '../prescription/phpMailer/PHPMailerAutoload.php';
 
+        $mail = new PHPMailer;
+
+          $mail->isSMTP();
+
+        //Enable SMTP debugging
+        // 0 = off (for production use)
+        // 1 = client messages
+        // 2 = client and server messages
+        $mail->SMTPDebug = 0;
+
+        $mail->SMTPOptions = array(
+                'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' =>true
+                )
+        );
+
+        //Set the hostname of the mail server
+        $mail->Host = 'smtp.gmail.com';
+
+        //Set the SMTP port number - 587 for authenticated TLS, a.k.a. RFC4409 SMTP submission
+        $mail->Port = 587;
+
+        //Set the encryption system to use - ssl (deprecated) or tls
+        $mail->SMTPSecure = 'tls';
+
+        //Whether to use SMTP authentication
+        $mail->SMTPAuth = true;
+
+        //Username to use for SMTP authentication - use full email address for gmail
+        $mail->Username = "anup.pharmakit@gmail.com";
+
+        //Password to use for SMTP authentication
+        $mail->Password = "anuppharmakit";
+
+        //Set who the message is to be sent from
+        $mail->setFrom('anup.pharmakit@gmail.com', 'MediKeen');
+
+        //Set who the message is to be sent to
+        $mail->addAddress($email, $email);
+
+        //Set the subject line
+        $mail->Subject = 'MediKeen password reset code';
+
+        $mail->Body ="\nMediKeen"
+                . "\n\nYour MediKeen password reset code is: $resetCode"
+                . "\nPlease note that the code will expire within 60 minutes.";
+
+        //send the message, check for errors
+        if (!$mail->send()) {
+            return FALSE;
+        } else {
+            return TRUE;
+        }
+        }
+    }
 ?>
