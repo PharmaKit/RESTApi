@@ -28,7 +28,7 @@ class DB_Functions_Prescription {
     }
     
     public function getPrescriptionsByPersonId($personId){
-        $result = mysqli_query($this->mysqli, "select resource_id from image_uploads where person_id = $personId order by created_date desc;");
+        $result = mysqli_query($this->mysqli, "select * from image_uploads where person_id = $personId order by created_date desc;");
         $rows = array();
         while ($r = mysqli_fetch_assoc($result)) {
             $rows[] = $r;

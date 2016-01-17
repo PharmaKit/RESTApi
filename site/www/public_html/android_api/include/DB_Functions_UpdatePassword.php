@@ -137,6 +137,20 @@ class DB_Functions_UpdatePassword {
         }
     }
     
+    public function validateAndUpdatePassword($email,$currentPassword,$newPassword) {
+        require_once 'DB_Functions_Patient.php';
+        
+        $dbPatieht = new DB_Functions_Patient();
+        
+        $isValid = $dbPatieht->validateUserByEmailAndPassword($email, $currentPassword);
+        
+        if($isValid) {
+            $isUpdated = $this->updatePassoword($email, $newPassword);            
+            return $isUpdated;
+        }
+        return false;
+    }
+            
     function updatePassoword($email, $newPassword) {
             $uuid = uniqid('', true);
             $hash = $this->hashSSHA($newPassword);

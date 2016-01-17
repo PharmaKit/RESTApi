@@ -73,10 +73,24 @@ class DB_Functions_Patient {
                 // user authentication details are correct
                 return $result;
             }
+            else
+            {
+                return false;
+            }
         } else {
             // user not found
             return false;
         }
+    }
+    
+    public function validateUserByEmailAndPassword($email, $password) {
+        
+        $user = $this->getUserByEmailAndPassword($email,$password);
+        
+        if($user != false) {
+            return true;
+        }
+        return false;
     }
 
     /**

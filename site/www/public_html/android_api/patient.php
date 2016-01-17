@@ -81,11 +81,15 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
             if ($user) {
                 // user stored successfully
                 $response["success"] = 1;
-                $response["patient"]["patient_id"] = $user["patient_id"];
-                $response["patient"]["person_id"] = $user["person_id"];
-                $response["patient"]["name"] = $user["name"];
-                $response["patient"]["email"] = $user["email"];
+                $response["user"]["patient_id"] = $user["patient_id"];
+                $response["user"]["person_id"] = $user["person_id"];
+                $response["user"]["name"] = $user["name"];
+                $response["user"]["email"] = $user["email"];
                 $response["user"]["telephone"] = $user["telephone"];
+                
+                $address = $db->getAddressByPersonId($user["person_id"]);
+                $response["address"] = $address;
+                
                 echo json_encode($response);
             } else {
                 // user failed to store
