@@ -66,8 +66,8 @@ class DB_Functions_Patient {
 
 		$otp = rand(100000, 999999);
         // delete the old otp if exists
-        $resultD = mysqli_query($this->mysql, "DELETE FROM sms_codes where user_id = $user_id");
-		$resultI = mysqli_query($this->mysql, "INSERT INTO sms_codes(user_id, code, status) values('$user_id, '$otp', 0)");
+        $resultD = mysqli_query($this->mysqli, "DELETE FROM sms_codes where user_id = $user_id");
+		$resultI = mysqli_query($this->mysqli, "INSERT INTO sms_codes(user_id, code, status) values('$user_id, '$otp', 0)");
  
         return $otp;
     }
@@ -78,7 +78,7 @@ class DB_Functions_Patient {
 		$otp_prefix = ':';
 	 
 		//Your message to send, Add URL encoding here.
-		$message = urlencode("Hello! Welcome to MediKeen. Your OPT is '$otp_prefix $otp'");
+		$message = urlencode("Hello! Welcome to MediKeen. Your one time password is $otp_prefix $otp");
 	 
 		$response_type = 'json';
 	 
@@ -155,12 +155,12 @@ class DB_Functions_Patient {
     public function verifyOTP($otp, $key) {
 		
 		//todo verify user passes correct session key. Key is sent to user during login 
-		$userData = mysqli_query("SELECT u.id, u.name, u.email, u.mobile, u.apikey, u.status, u.created_at FROM users u, sms_codes WHERE sms_codes.code = '$otp' AND sms_codes.user_id = u.id");
+		$userData = mysqli_query($this->mysqli, "SELECT u.id, u.name, u.email, u.mobile, u.apikey, u.status, u.created_at FROM users u, sms_codes WHERE sms_codes.code = '$otp' AND sms_codes.user_id = u.id");
 		if ($userData->num_rows > 0) {
 			$row = $userData->fetch_assoc();
                         $id = $row["id"];
-			$resultU = mysqli_query("UPDATE users set isActivated = 1 where id = '$id'");
-			$resultS = mysqli_query("UPDATE sms_codes set status = 1 where uid = '$id'");
+			$resultU = mysqli_query($this->mysqli, "UPDATE users set isActivated = 1 where id = '$id'");
+			$resultS = mysqli_query($this->mysqli, "UPDATE sms_codes set status = 1 where uid = '$id'");
 		}
 	}
     
