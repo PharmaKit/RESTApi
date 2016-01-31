@@ -100,7 +100,7 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
         }
     } 
     else if ($tag == 'verifyOTP'){
-		$opt = $_POST['opt'];
+		$opt = $_POST['otp'];
         $key = $_POST['authorizationKey'];
         
         if($db->verifyOTP($opt, $key))
