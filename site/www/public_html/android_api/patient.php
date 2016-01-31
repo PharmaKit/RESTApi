@@ -100,15 +100,18 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
         }
     } 
     else if ($tag == 'verifyOTP'){
-		$opt = $_POST['otp'];
+		$otp = $_POST['otp'];
         $key = $_POST['authorizationKey'];
         
-        if($db->verifyOTP($opt, $key))
+        if($db->verifyOTP($otp, $key))
         {
-			$response["status"] = "success";
+			$response["success"] = 1;
 		}
 		else
-			$response['status'] = "error";
+		{
+			$response["error"] = 1;
+			$response["error_msg"] = "Error occured in otp verification";
+		}
 	}
     else {
         echo "Invalid Request";
