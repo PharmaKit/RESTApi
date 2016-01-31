@@ -98,7 +98,19 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
                 echo json_encode($response);
             }
         }
-    } else {
+    } 
+    else if ($tag == 'verifyOTP'){
+		$opt = $_POST['opt'];
+        $key = $_POST['sessionKey'];
+        
+        if($db->verifyOTP($opt, $key))
+        {
+			$response["status"] = "success";
+		}
+		else
+			$response['status'] = "error";
+	}
+    else {
         echo "Invalid Request";
     }
 } else {

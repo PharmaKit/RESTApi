@@ -67,7 +67,7 @@ class DB_Functions_Patient {
 		$otp = rand(100000, 999999);
         // delete the old otp if exists
         $resultD = mysqli_query($this->mysqli, "DELETE FROM sms_codes where user_id = $user_id");
-		$resultI = mysqli_query($this->mysqli, "INSERT INTO sms_codes(user_id, code, isActivated) values('$user_id, '$otp', 0)");
+		$resultI = mysqli_query($this->mysqli, "INSERT INTO sms_codes(user_id, code, isActivated) values('$user_id', '$otp', 0)");
  
         return $otp;
     }
@@ -161,7 +161,12 @@ class DB_Functions_Patient {
                         $id = $row["id"];
 			$resultU = mysqli_query($this->mysqli, "UPDATE users set isActivated = 1 where id = '$id'");
 			$resultS = mysqli_query($this->mysqli, "UPDATE sms_codes set isActivated = 1 where uid = '$id'");
+			
+			if($resultU && $resultS)
+				return true;
 		}
+		else
+			return false;
 	}
     
     public function validateUserByEmailAndPassword($email, $password) {
