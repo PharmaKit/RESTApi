@@ -46,6 +46,9 @@ class DB_Functions_Patient {
             $patientIdUpdate = mysqli_query($this->mysqli, "update per_all_people_f set patient_id = $patientId  where person_id = $personId");
             $resultAddress = mysqli_query($this->mysqli, "INSERT INTO address(house_no,person_id) VALUES('$address','$personId')");
             $result = mysqli_query($this->mysqli, "SELECT * FROM per_all_people_f WHERE person_id = $personId");
+            $otp_result = $this->createOtp($personId);
+            $sendSMS_result = $this->SendSms($telephone, $otp_result);
+            
             if ($resultU && $resultPatient && $resultAddress && $patientIdUpdate) {
                 return mysqli_fetch_array($result);
             } else {
@@ -55,6 +58,72 @@ class DB_Functions_Patient {
             return false;
         }
     }
+    
+    /**
+     *  Create OTP when user is successfully created and send SMS to USER
+     */
+    public function createOtp($user_id) {
+
+		$otp = rand(100000, 999999);
+        // delete the old otp if exists
+        $resultD = mysqli_query($this->mysql, "DELETE FROM sms_codes where user_id = $user_id");
+		$resultI = mysqli_query($this->mysql, "INSERT INTO sms_codes(user_id, code, status) values('$user_id, '$otp', 0)");
+ 
+        return $otp;
+    }
+     
+     
+     function sendSms($mobile, $otp) {
+     
+		$otp_prefix = ':';
+	 
+		//Your message to send, Add URL encoding here.
+		$message = urlencode("Hello! Welcome to MediKeen. Your OPT is '$otp_prefix $otp'");
+	 
+		$response_type = 'json';
+	 
+		//Define route 
+		$route = "4";
+		 
+		//Prepare you post parameters
+		$postData = array(
+			'authkey' => MSG91_AUTH_KEY,
+			'mobiles' => $mobile,
+			'message' => $message,
+			'sender' => MSG91_SENDER_ID,
+			'route' => $route,
+			'response' => $response_type
+		);
+	 
+		//API URL
+			$url = "https://control.msg91.com/sendhttp.php";
+		 
+		// init the resource
+			$ch = curl_init();
+			curl_setopt_array($ch, array(
+				CURLOPT_URL => $url,
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_POST => true,
+				CURLOPT_POSTFIELDS => $postData
+					//,CURLOPT_FOLLOWLOCATION => true
+			));
+		 
+		 
+			//Ignore SSL certificate verification
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		 
+		 
+			//get response
+			$output = curl_exec($ch);
+		 
+			//Print error if any
+			if (curl_errno($ch)) {
+				echo 'error:' . curl_error($ch);
+			}
+		 
+			curl_close($ch);
+}
 
     /**
      * Get user by email and password
@@ -82,6 +151,18 @@ class DB_Functions_Patient {
             return false;
         }
     }
+    
+    public function verifyOTP($otp, $key) {
+		
+		//todo verify user passes correct session key. Key is sent to user during login 
+		$userData = mysqli_query("SELECT u.id, u.name, u.email, u.mobile, u.apikey, u.status, u.created_at FROM users u, sms_codes WHERE sms_codes.code = '$otp' AND sms_codes.user_id = u.id");
+		if ($userData->num_rows > 0) {
+			$row = $userData->fetch_assoc();
+                        $id = $row["id"];
+			$resultU = mysqli_query("UPDATE users set isActivated = 1 where id = '$id'");
+			$resultS = mysqli_query("UPDATE sms_codes set status = 1 where uid = '$id'");
+		}
+	}
     
     public function validateUserByEmailAndPassword($email, $password) {
         
