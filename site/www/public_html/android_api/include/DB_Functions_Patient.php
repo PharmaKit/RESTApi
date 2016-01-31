@@ -41,12 +41,13 @@ class DB_Functions_Patient {
             $salt = $hash["salt"]; // salt
 
             $resultU = mysqli_query($this->mysqli, "INSERT INTO users(unique_id, name, email, person_id, encrypted_password, salt, created_at) VALUES('$uuid', '$name', '$email', '$personId', '$encrypted_password', '$salt', NOW())");
+            $userId = mysqli_insert_id($this->mysqli);
             $resultPatient = mysqli_query($this->mysqli, "INSERT INTO patient(person_id) VALUES('$personId')");
             $patientId = mysqli_insert_id($this->mysqli); // last inserted id
             $patientIdUpdate = mysqli_query($this->mysqli, "update per_all_people_f set patient_id = $patientId  where person_id = $personId");
             $resultAddress = mysqli_query($this->mysqli, "INSERT INTO address(house_no,person_id) VALUES('$address','$personId')");
             $result = mysqli_query($this->mysqli, "SELECT * FROM per_all_people_f WHERE person_id = $personId");
-            $otp_result = $this->createOtp($personId);
+            $otp_result = $this->createOtp($userId);
             $sendSMS_result = $this->SendSms($telephone, $otp_result);
             
             if ($resultU && $resultPatient && $resultAddress && $patientIdUpdate) {
@@ -67,7 +68,7 @@ class DB_Functions_Patient {
 		$otp = rand(100000, 999999);
         // delete the old otp if exists
         $resultD = mysqli_query($this->mysqli, "DELETE FROM sms_codes where user_id = $user_id");
-		$resultI = mysqli_query($this->mysqli, "INSERT INTO sms_codes(user_id, code, isActivated) values('$user_id', '$otp', 0)");
+		$resultI = mysqli_query($this->mysqli, "INSERT INTO sms_codes(user_id, code, isActivated) values($user_id, '$otp', 0)");
  
         return $otp;
     }
@@ -155,12 +156,12 @@ class DB_Functions_Patient {
     public function verifyOTP($otp, $key) {
 		
 		//todo verify user passes correct session key. Key is sent to user during login 
-		$userData = mysqli_query($this->mysqli, "SELECT u.id, u.name, u.email, u.mobile, u.apikey, u.status, u.created_at FROM users u, sms_codes WHERE sms_codes.code = '$otp' AND sms_codes.user_id = u.id");
-		if ($userData->num_rows > 0) {
+		$userData = mysqli_query($this->mysqli, "SELECT u.uid FROM users u, sms_codes WHERE sms_codes.code = '$otp' AND sms_codes.user_id = u.uid") or die(mysqli_error($this->mysqli));
+		if (mysqli_num_rows($userData) > 0) {
 			$row = $userData->fetch_assoc();
-                        $id = $row["id"];
-			$resultU = mysqli_query($this->mysqli, "UPDATE users set isActivated = 1 where id = '$id'");
-			$resultS = mysqli_query($this->mysqli, "UPDATE sms_codes set isActivated = 1 where uid = '$id'");
+                        $uid = $row["uid"];
+			$resultU = mysqli_query($this->mysqli, "UPDATE users set isActivated = 1 where uid = $uid");
+			$resultS = mysqli_query($this->mysqli, "UPDATE sms_codes set isActivated = 1 where user_id = $uid");
 			
 			if($resultU && $resultS)
 				return true;

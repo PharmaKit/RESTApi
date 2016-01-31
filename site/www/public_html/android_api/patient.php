@@ -106,11 +106,13 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
         if($db->verifyOTP($otp, $key))
         {
 			$response["success"] = 1;
+                        echo json_encode($response);
 		}
 		else
 		{
 			$response["error"] = 1;
 			$response["error_msg"] = "Error occured in otp verification";
+                        echo json_encode($response);
 		}
 	}
     else {
