@@ -52,6 +52,7 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
             $response["user"]["patient_id"] = $user["patient_id"];
             $response["user"]["telephone"] = $user["telephone"];
             $response["address"] = $address;
+            $response["isActivated"] = $validCredentials["isActivated"];
             
             echo json_encode($response);
         } else {
@@ -89,6 +90,7 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
                 
                 $address = $db->getAddressByPersonId($user["person_id"]);
                 $response["address"] = $address;
+                $response["isActivated"] = 0;
                 
                 echo json_encode($response);
             } else {
