@@ -1,4 +1,8 @@
 <?php
+
+require '../composer/vendor/autoload.php';
+$logger = new Katzgrau\KLogger\Logger(__DIR__.'/logs');
+
 $target_dir = "uploads/";
 $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
 
@@ -164,8 +168,12 @@ $mail->addAttachment($target_file);
 //send the message, check for errors
 if (!$mail->send()) {
     echo "Mailer Error: " . $mail->ErrorInfo;
+    
+    $logger->error("Error occurred while sending email for image $target_file");
+    $logger->error("Mailer Error: " . $mail->ErrorInfo);
 } else {
     echo "Message sent!";
+    $logger->info("Email was successfully sent for image $target_file");
 }
 }
 
