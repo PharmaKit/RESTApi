@@ -232,6 +232,17 @@ class DB_Functions_Patient {
             return false;
         }
     }
+    
+    public function addGcmToken($userId,$token) {
+        
+        $result = mysqli_query($this->mysqli, "call add_user_gcm_registration_token($userId,'$token');") or die(mysqli_error($this->mysqli));
+        
+        if($result)
+        {
+            return TRUE;
+        }
+        return FALSE;
+    }
 
     /**
      * Encrypting password

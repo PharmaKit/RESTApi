@@ -62,6 +62,17 @@ class DB_Functions_Pharmacy {
         return FALSE;
     }
     
+    public function addGcmToken($pharmacyUserId,$pharmacyProfileId,$token) {
+        
+        $result = mysqli_query($this->mysqli, "call add_gcm_registration_token($pharmacyUserId,$pharmacyProfileId,'$token');") or die(mysqli_error($this->mysqli));
+        
+        if($result)
+        {
+            return TRUE;
+        }
+        return FALSE;
+    }
+    
     public function randomString($length) {       
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+`"';
         $randstring = '';
@@ -78,6 +89,8 @@ class DB_Functions_Pharmacy {
     public function getPharmacyProfileById($pharmacyProfileId) {
         $result = mysqli_query($this->mysqli, "SELECT * FROM pharmacy_profile where pharmacy_profile_id = $pharmacyProfileId;") or die(mysqli_error($this->mysqli));
         // check for result 
+        echo $this->mysqli->error;        
+        
         $no_of_rows = mysqli_num_rows($result);
         if ($no_of_rows > 0) {
             $result = mysqli_fetch_array($result);
@@ -88,12 +101,33 @@ class DB_Functions_Pharmacy {
         }
     }
     
-    public function getAllPrescriptionsByPharmacyProfileId($pharmacyProfileId, $pageNo, $limit)
+    public function getPrescriptionsByPharmacyProfileId($pharmacyProfileId, $pageNo, $limit, $orderType)
     {
+        $terminalStates = ["VerificationFailed","Delivered","OrderCancelled","DeliveryFailed"];
         $offset = $pageNo * $limit;
+        $query = "select * from image_uploads where pharmacy_profile_id = $pharmacyProfileId order by created_date desc limit $offset,$limit;";
         
-        $result = mysqli_query($this->mysqli, "select * from image_uploads where pharmacy_profile_id = $pharmacyProfileId order by created_date desc limit $offset,$limit;");
+        if($orderType == "1") {
+            $query = "select * from image_uploads where order_status NOT IN('$terminalStates[0]','$terminalStates[1]','$terminalStates[2]','$terminalStates[3]') and pharmacy_profile_id = $pharmacyProfileId order by created_date desc limit $offset,$limit;";
+        } else if($orderType == "2") {
+            $query = "select * from image_uploads where order_status IN('$terminalStates[0]','$terminalStates[1]','$terminalStates[2]','$terminalStates[3]') and pharmacy_profile_id = $pharmacyProfileId order by created_date desc limit $offset,$limit;";
+        }
+                    
+        return $this->executeSelectQueryAndGetResult($query);
+    }
+    
+    public function getPrescriptionByOrderNo($pharmacyProfileId, $orderNo)
+    {     
+        $result = mysqli_query($this->mysqli, "select * from image_uploads where pharmacy_profile_id = $pharmacyProfileId and resource_id = $orderNo;");
         $rows = array();
+        
+        echo $this->mysqli->error;
+        
+        if($result == false)
+        {
+            return false;
+        }
+        
         while ($r = mysqli_fetch_assoc($result)) {
             $rows[] = $r;
         }
@@ -104,10 +138,17 @@ class DB_Functions_Pharmacy {
         }
     }
     
-    public function getPrescriptionByOrderNo($pharmacyProfileId, $orderNo)
-    {     
-        $result = mysqli_query($this->mysqli, "select * from image_uploads where pharmacy_profile_id = $pharmacyProfileId and resource_id = $orderNo;");
+    private function executeSelectQueryAndGetResult($query) 
+    {
+        $result = mysqli_query($this->mysqli, $query);
+        
+        echo $this->mysqli->error;
         $rows = array();
+        
+        if($result == false)
+        {
+            return false;
+        }
         while ($r = mysqli_fetch_assoc($result)) {
             $rows[] = $r;
         }
@@ -127,7 +168,7 @@ class DB_Functions_Pharmacy {
     
     public function updatePrescriptionStatus($pharmacyProfileId, $orderNo, $status)
     {
-        $result = mysqli_query($this->mysqli, "update image_uploads set order_status = '$status' where is_valid = 1 and pharmacy_profile_id = $pharmacyProfileId and resource_id = $orderNo;");
+        $result = mysqli_query($this->mysqli, "update image_uploads set order_status = '$status', is_update_notification_sent = 0 where is_valid = 1 and pharmacy_profile_id = $pharmacyProfileId and resource_id = $orderNo;");
         
         return $this->mysqli->affected_rows == 1;
     }
@@ -170,7 +211,7 @@ class DB_Functions_Pharmacy {
      */
     public function hashSSHA($password) {
 
-        $salt = sha1(rand());
+        //$salt = sha1(rand());
         $salt = substr($salt, 0, 10);
         $encrypted = base64_encode(sha1($password . $salt, true) . $salt);
         $hash = array("salt" => $salt, "encrypted" => $encrypted);

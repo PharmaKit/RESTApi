@@ -30,7 +30,7 @@ class DB_Functions_Authorization {
                 return TRUE;
             } 
         }
-        return FASLE;
+        return FALSE;
     }
     
     public function getAuthorizedPharmacyUser($headers) {

@@ -49,12 +49,12 @@
         $prescription = $dbPharmacy->getPrescriptionByOrderNo($pharmacyProfileId, $orderNo);
         
         if($prescription == FALSE) {
-            $logger->error("prescription not found. pharmacy_user_id: '$pharmacyProfileId', pharmacy_profile_id: '$pharmacyUserId', uri: '$requestUri'");
+            $logger->error("prescription not found. pharmacy_user_id: '$pharmacyUserId', pharmacy_profile_id: '$pharmacyProfileId', uri: '$requestUri'");
             http_response_code(404);
             $responseHelper->RespondAndExitWithError($response, "PrescriptionNotFound", "Prescription with orderno = '$orderNo' was not found");
         }
         
-        $logger->info("Successfullt got prescrition. pharmacy_user_id: '$pharmacyProfileId', pharmacy_profile_id: '$pharmacyUserId', uri: '$requestUri'");
+        $logger->info("Successfullt got prescrition. pharmacy_user_id: '$pharmacyUserId', pharmacy_profile_id: '$pharmacyProfileId', uri: '$requestUri'");
     
         $response["success"] = TRUE;
         $response["pharmacy_profile_id"] = $authorizationResult["pharmacy_profile_id"];
@@ -62,15 +62,21 @@
         echo json_encode($response);
     }
     else {
-        $prescriptionHistory = $dbPharmacy->getAllPrescriptionsByPharmacyProfileId($pharmacyProfileId, $pageNo, $limit);
+        $orderType = 0;
+        
+        if(isset($_GET['ordertype'])) {
+            $orderType = $_GET['ordertype'];
+        }
+        
+        $prescriptionHistory = $dbPharmacy->getPrescriptionsByPharmacyProfileId($pharmacyProfileId, $pageNo, $limit, $orderType);
     
         if($prescriptionHistory == FALSE) {
-            $logger->error("Getting prescription history failed. pharmacy_user_id: '$pharmacyProfileId', pharmacy_profile_id: '$pharmacyUserId'");
+            $logger->error("Getting prescription history failed. pharmacy_user_id: '$pharmacyUserId', pharmacy_profile_id: '$pharmacyProfileId'");
             http_response_code(500);
             $responseHelper->RespondAndExitWithError($response, "GettingPrescriptionHistoryFailed", "Getting prescription history failed. Please contact support or try again later");
         }
             
-        $logger->info("Successfullt got prescrition history. pharmacy_user_id: '$pharmacyProfileId', pharmacy_profile_id: '$pharmacyUserId', uri: '$requestUri'");
+        $logger->info("Successfullt got prescrition history. pharmacy_user_id: '$pharmacyUserId', pharmacy_profile_id: '$pharmacyProfileId', uri: '$requestUri'");
     
         $response["success"] = TRUE;
         $response["pharmacy_profile_id"] = $authorizationResult["pharmacy_profile_id"];
